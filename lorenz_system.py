@@ -7,33 +7,66 @@ import numpy as np
 
 def main():
 
-  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC TIME
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC TIME
 
-  max_time_int = 1e2
+  max_time_int = 2e2
   time_step_float =  0.01
   time_interval_ary = np.arange( 0, max_time_int, time_step_float )
 
-  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC FILE
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC FILE
 
   out_file = open("ts_lorenz_system.dat","w")
 
-  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC INITIAL CONDITIONS
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC INITIAL CONDITIONS 1
 
-  x_float = 2
-  y_float = 3
-  z_float = 4
+  x_aux_float = 1
+  y_aux_float = 1
+  z_aux_float = 1
   
-  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC RUNGE-KUTTA 4TH
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC INITIAL CONDITIONS 2
+
+  x_float = 1+1e-6
+  y_float = 1+1e-6
+  z_float = 1+1e-6
+  
 
   out_file.write( str(x_float)+"\t"+str(y_float)+"\t"+str(z_float)+"\n"  )
 
   for time_float in time_interval_ary:
 
-  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC RK1
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC LYAPUNOV EXPONENT
 
-    # x_float += lorentz_x( x_float, y_float )*time_step_float
-    # y_float += lorentz_y( x_float, y_float, z_float )*time_step_float
-    # z_float += lorentz_z( x_float, y_float, z_float )*time_step_float
+    delta_x_rk4_float = x_float - x_aux_float
+    delta_y_rk4_float = y_float - y_aux_float 
+    delta_z_rk4_float = z_float - z_aux_float 
+
+    delta_init_cond_float = np.log( np.sqrt( (delta_x_rk4_float*delta_x_rk4_float)+(delta_y_rk4_float*delta_y_rk4_float)+(delta_z_rk4_float*delta_z_rk4_float) ) )
+
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC OUTPUT
+
+    out_file.write( str(time_float)+"\t"+str(x_float)+"\t"+str(y_float)+"\t"+str(z_float)+"\t"+str(delta_init_cond_float)+"\n"  )
+
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC LYAPUNOV
+
+    k1x = lorentz_x( x_aux_float, y_aux_float )
+    k1y = lorentz_y( x_aux_float, y_aux_float, z_aux_float )
+    k1z = lorentz_z( x_aux_float, y_aux_float, z_aux_float )
+
+    k2x = lorentz_x( x_aux_float+(time_step_float*k1x*0.5), y_aux_float )
+    k2y = lorentz_y( x_aux_float, y_aux_float+(time_step_float*k1y*0.5), z_aux_float )
+    k2z = lorentz_z( x_aux_float, y_aux_float, z_aux_float+(time_step_float*k1z*0.5) )
+
+    k3x = lorentz_x( x_aux_float+(time_step_float*k2x*0.5), y_aux_float )
+    k3y = lorentz_y( x_aux_float, y_aux_float+(time_step_float*k2y*0.5), z_aux_float )
+    k3z = lorentz_z( x_aux_float, y_aux_float, z_aux_float+(time_step_float*k2z*0.5) )
+
+    k4x = lorentz_x( x_aux_float+(time_step_float*k3x), y_aux_float )
+    k4y = lorentz_y( x_aux_float, y_aux_float+(time_step_float*k3y), z_aux_float )
+    k4z = lorentz_z( x_aux_float, y_aux_float, z_aux_float+(time_step_float*k3z) )
+
+    x_aux_float += (time_step_float/6.0)*(k1x+(2.0*k2x)+(2.0*k3x)+k4x)
+    y_aux_float += (time_step_float/6.0)*(k1y+(2.0*k2y)+(2.0*k3y)+k4y)
+    z_aux_float += (time_step_float/6.0)*(k1z+(2.0*k2z)+(2.0*k3z)+k4z)
 
   # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC RK4
 
@@ -57,12 +90,11 @@ def main():
     y_float += (time_step_float/6.0)*(k1y+(2.0*k2y)+(2.0*k3y)+k4y)
     z_float += (time_step_float/6.0)*(k1z+(2.0*k2z)+(2.0*k3z)+k4z)
 
-    out_file.write( str(time_float)+"\t"+str(x_float)+"\t"+str(y_float)+"\t"+str(z_float)+"\n"  )
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC EOF
 
   out_file.close()
 
-
-  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCLORENZA_SYTEM
+  # CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC LORENZ_SYTEM
 
 def lorentz_x(
     x_float_,
