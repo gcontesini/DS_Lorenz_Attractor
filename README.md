@@ -34,8 +34,6 @@ With a lyapunov exponent of 0.892456 and a Lyapunov time of 1.12050 the system i
 
 Taken's theorem used with only the x ts. Here I make a lag of 10 time steps
 
-This is black magic for sure!
-
 ![Takens Theorem with x ts](https://github.com/gcontesini/DS_Lorenz_Attractor/blob/master/lorenz_x_takens_theorem.png)
 
 ![Takens Theorem with y ts](https://github.com/gcontesini/DS_Lorenz_Attractor/blob/master/lorenz_y_takens_theorem.png)
